@@ -71,9 +71,9 @@ contents.each do |row|
   day = datetime.wday
   days.push(day)
 
-  # form_letter = erb_template.result(binding)
+  form_letter = erb_template.result(binding)
 
-  # save_thank_you_letter(id, form_letter)
+  save_thank_you_letter(id, form_letter)
 end
 hours = hours.each_with_object(Hash.new(0)) do |hour, result|
   result[hour] += 1
