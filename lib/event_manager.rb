@@ -1,6 +1,7 @@
 require 'csv'
 require 'google/apis/civicinfo_v2'
 require 'erb'
+require 'date'
 
 def clean_zipcode(zipcode)
   zipcode.to_s.rjust(5, '0')[0..4]
@@ -54,17 +55,32 @@ contents = CSV.open(
 
 template_letter = File.read('form_letter.erb')
 erb_template = ERB.new template_letter
+hours = []
+days = []
 
 contents.each do |row|
   id = row[0]
-
   name = row[:first_name]
-
   zipcode = clean_zipcode(row[:zipcode])
-  phone = clean_phone_number(row[:homephone])
-
   legislators = legislators_by_zipcode(zipcode)
+  datetime = row[:regdate]
+  format = '%m/%d/%Y %H:%M'
+  datetime = DateTime.strptime(datetime, format)
+  hour = datetime.hour
+  hours.push(hour)
+  day = datetime.wday
+  days.push(day)
 
-  form_letter = erb_template.result(binding)
-  save_thank_you_letter(id, form_letter)
+  # form_letter = erb_template.result(binding)
+
+  # save_thank_you_letter(id, form_letter)
 end
+hours = hours.each_with_object(Hash.new(0)) do |hour, result|
+  result[hour] += 1
+end
+days = days.each_with_object(Hash.new(0)) do |day, result|
+  result[day] += 1
+end
+
+p hours
+p days
